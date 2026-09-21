@@ -7,10 +7,15 @@ __pycache__/
 .pytest_cache/
 
 # Large / regenerable artifacts
-data/apps_raw/          # raw HuggingFace download (~1.3GB, regenerable)
-data/problems/*.jsonl   # generated candidates/problems (large; regenerable via the seeded pipeline)
-models/cache/           # cached model calls can get large; keep locally
-output.txt              # stray redirect output
+# (comments must be on their own line -- git has no inline comments)
+# raw HuggingFace download (~1.3GB, regenerable)
+data/apps_raw/
+# generated candidates/problems (hundreds of MB; regenerable via the seeded pipeline)
+data/problems/*.jsonl
+# cached model calls can get large; keep local
+models/cache/
+# stray redirect output
+output.txt
 *.log
 
 # OS / editor
