@@ -16,6 +16,8 @@ data/problems/*.jsonl
 models/cache/
 # stray redirect output
 output.txt
+# one-off local helper script
+retag_commits.sh
 *.log
 
 # OS / editor
