@@ -7,8 +7,8 @@ useful work can we extract while keeping successful sabotage rare?
 Novel piece: an attack policy derived as an **optimal stopping problem** (a
 time-varying threshold rule), compared against a heuristic attacker.
 
-See [`CLAUDE.md`](CLAUDE.md) for the full project brief and [`SETUP.md`](SETUP.md)
-to get running.
+See [`SETUP.md`](SETUP.md) to get running. The key design decisions and the
+Week-1 plan are summarized below.
 
 ## Repo map
 ```
