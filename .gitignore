@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Large / regenerable artifacts
+data/apps_raw/          # raw HuggingFace download (~1.3GB, regenerable)
+data/problems/*.jsonl   # generated candidates/problems (large; regenerable via the seeded pipeline)
+models/cache/           # cached model calls can get large; keep locally
+output.txt              # stray redirect output
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Claude / assistant files (used for development; kept local, not committed)
+CLAUDE.md
+CLAUDE.local.md
+CLAUDE.md.txt
+.claude/
+
+# Keep these tracked even though the dirs above are ignored:
+!results/.gitkeep
+!data/.gitkeep

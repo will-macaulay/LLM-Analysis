@@ -1,0 +1,18 @@
+# Core data / dataset handling
+# Pinned <4.0: APPS (codeparrot/apps) is a script-based dataset, and datasets
+# 4.0+ dropped support for loading scripts / trust_remote_code.
+datasets>=3.0,<4.0
+huggingface_hub>=0.23
+pandas>=2.0
+numpy>=1.24
+
+# Local model inference (Ollama exposes an OpenAI-compatible / native HTTP API)
+requests>=2.31
+ollama>=0.3
+
+# Analysis / plotting
+matplotlib>=3.7
+tqdm>=4.66
+
+# Dev
+pytest>=8.0
