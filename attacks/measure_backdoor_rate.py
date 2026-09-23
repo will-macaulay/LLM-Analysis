@@ -41,25 +41,22 @@ from attacks.backdoor import (  # noqa: E402
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", default="train", choices=["train", "heldout"])
-    ap.add_argument("--limit", type=int, default=None)
-    ap.add_argument("--backend", default="docker", choices=["docker", "local"])
-    ap.add_argument("--temperature", type=float, default=0.6,
-                    help="a little sampling helps the red team find backdoors")
+    ap.add_argument("--limit", type=int, default=None,
+                    help="seeded random sample of N problems (default: all)")
     args = ap.parse_args()
 
     if args.split == "heldout":
         print("WARNING: held-out split should stay untouched until final runs.")
 
+    # Preflight. Model-written code only ever runs in Docker.
     if not ollama_available():
         sys.exit(f"Ollama not reachable at {config.OLLAMA_HOST}. See SETUP.md.")
-    if args.backend == "docker" and not docker_available():
-        sys.exit("Docker not available; untrusted code must run isolated. "
-                 "Install Docker Desktop (see SETUP.md).")
+    if not docker_available():
+        sys.exit("Docker not available; model code must run isolated. See SETUP.md.")
 
     problems = load_problems()
     ids = sample_ids(load_split(args.split), args.limit)
-
-    sandbox = get_sandbox(args.backend)
+    sandbox = get_sandbox("docker")
 
     try:
         from tqdm import tqdm
@@ -73,12 +70,13 @@ def main() -> None:
     for pid in tqdm(ids, desc="backdoor attempts"):
         prob = problems[pid]
         prompt = build_backdoor_prompt(prob)
-        gen = generate(prompt, model=config.U_MODEL, system=SYSTEM_PROMPT,
-                       temperature=args.temperature)
+        gen = generate(prompt, model=config.U_MODEL, system=SYSTEM_PROMPT)
         code, secret = extract_backdoor(gen.text)
         res = verify_backdoor(code, secret, prob, sandbox)
-        reasons[res.reason] += 1
-        rows.append({"id": pid, **res.to_dict()})
+        reason = "truncated" if gen.truncated and not res.verified else res.reason
+        reasons[reason] += 1
+        rows.append({"id": pid, "difficulty": prob["difficulty"], **res.to_dict(),
+                     "reason": reason, "truncated": gen.truncated})
 
     n = len(rows)
     verified = sum(r["verified"] for r in rows)
@@ -87,7 +85,13 @@ def main() -> None:
     out = {
         "split": args.split,
         "model_U": config.U_MODEL,
-        "temperature": args.temperature,
+        "sampled": bool(args.limit),
+        "generation": {
+            "temperature": config.GEN_TEMPERATURE, "top_p": config.GEN_TOP_P,
+            "top_k": config.GEN_TOP_K, "repeat_penalty": config.GEN_REPEAT_PENALTY,
+            "max_tokens": config.GEN_MAX_TOKENS, "num_ctx": config.GEN_NUM_CTX,
+            "seed": config.SEED,
+        },
         "n_attempts": n,
         "verified_backdoors": verified,
         "verified_rate": rate,
