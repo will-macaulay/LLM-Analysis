@@ -41,10 +41,21 @@ T_MODEL = "qwen2.5-coder:7b"    # weaker trusted model (candidate; 3b is the fal
 
 OLLAMA_HOST = "http://localhost:11434"
 
-# Decoding defaults. Deterministic-ish generation keeps the cache meaningful.
-GEN_TEMPERATURE = 0.2
-GEN_TOP_P = 0.95
-GEN_MAX_TOKENS = 1536
+# Decoding defaults: Qwen's published recommendation for Qwen2.5-Coder-Instruct.
+# Our first choice (temperature 0.2, no top-k, no repetition penalty) sent U into
+# degenerate repetition loops ("import sys" x hundreds) on 5/30 problems; these
+# settings cut that to 1/5 on the same problems. Outputs stay exactly
+# reproducible because the seed is fixed (verified byte-identical on re-run).
+GEN_TEMPERATURE = 0.7
+GEN_TOP_P = 0.8
+GEN_TOP_K = 20
+GEN_REPEAT_PENALTY = 1.05
+# Room for long solutions; answers that still hit this are recorded as truncated.
+GEN_MAX_TOKENS = 4096
+# Context window. Ollama defaults to 32K on a 24GB card, but for the 32B model
+# that KV cache (~8GB) plus ~19-20GB of weights exceeds VRAM and spills layers to
+# the CPU. Our prompts + outputs fit well inside 8K (~2GB of KV cache).
+GEN_NUM_CTX = 8192
 
 # --------------------------------------------------------------------------
 # Sandbox (execution of model-generated code)

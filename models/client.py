@@ -25,6 +25,7 @@ class GenResult:
     model: str
     cached: bool
     latency_s: float
+    truncated: bool = False  # hit the max-token limit (e.g. a repetition loop)
 
 
 def ollama_available(host: str = config.OLLAMA_HOST) -> bool:
@@ -49,22 +50,33 @@ def _build_payload(
     temperature: float,
     top_p: float,
     max_tokens: int,
+    num_ctx: int,
+    top_k: int = config.GEN_TOP_K,
+    repeat_penalty: float = config.GEN_REPEAT_PENALTY,
+    extra_options: dict | None = None,
 ) -> dict:
     """The exact object that is both the cache key and the Ollama request body."""
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
+    options = {
+        "temperature": temperature,
+        "top_p": top_p,
+        "top_k": top_k,
+        "repeat_penalty": repeat_penalty,
+        "num_predict": max_tokens,
+        "num_ctx": num_ctx,
+        "seed": seed,
+    }
+    # Any other sampler settings go into the same options dict, so they are
+    # part of the cache key too.
+    options.update(extra_options or {})
     return {
         "model": model,
         "messages": messages,
         "stream": False,
-        "options": {
-            "temperature": temperature,
-            "top_p": top_p,
-            "num_predict": max_tokens,
-            "seed": seed,
-        },
+        "options": options,
     }
 
 
@@ -76,25 +88,32 @@ def generate(
     seed: int = config.SEED,
     temperature: float = config.GEN_TEMPERATURE,
     top_p: float = config.GEN_TOP_P,
+    top_k: int = config.GEN_TOP_K,
+    repeat_penalty: float = config.GEN_REPEAT_PENALTY,
     max_tokens: int = config.GEN_MAX_TOKENS,
+    num_ctx: int = config.GEN_NUM_CTX,
+    extra_options: dict | None = None,
     use_cache: bool = True,
     host: str = config.OLLAMA_HOST,
     max_retries: int = 3,
 ) -> GenResult:
     """Generate a completion, hitting the disk cache first."""
-    payload = _build_payload(prompt, model, system, seed, temperature, top_p, max_tokens)
+    payload = _build_payload(prompt, model, system, seed, temperature, top_p, max_tokens,
+                             num_ctx, top_k, repeat_penalty, extra_options)
 
     if use_cache:
         hit = _cache.get(payload)
         if hit is not None:
-            text = hit["response"]["message"]["content"]
-            return GenResult(text=text, model=model, cached=True, latency_s=0.0)
+            resp = hit["response"]
+            return GenResult(text=resp["message"]["content"], model=model, cached=True,
+                             latency_s=0.0, truncated=resp.get("done_reason") == "length")
 
     last_err: Exception | None = None
     for attempt in range(max_retries):
         try:
             start = time.perf_counter()
-            r = requests.post(f"{host}/api/chat", json=payload, timeout=600)
+            # 4096 tokens at a slow ~10 tok/s is ~7 minutes; leave headroom.
+            r = requests.post(f"{host}/api/chat", json=payload, timeout=1200)
             r.raise_for_status()
             data = r.json()
             latency = time.perf_counter() - start
@@ -105,6 +124,7 @@ def generate(
                 model=model,
                 cached=False,
                 latency_s=latency,
+                truncated=data.get("done_reason") == "length",
             )
         except Exception as e:  # noqa: BLE001
             last_err = e
