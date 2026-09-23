@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import random
 import sys
 from pathlib import Path
 
@@ -20,6 +21,18 @@ def load_problems() -> dict[int, dict]:
             p = json.loads(line)
             out[p["id"]] = p
     return out
+
+
+def sample_ids(ids: list[int], limit: int | None) -> list[int]:
+    """A seeded random subset of `ids`, for quick runs with --limit.
+
+    Split files are sorted by id, and APPS ids cluster by difficulty (the low
+    thousands are competition problems), so `ids[:limit]` would be a heavily
+    skewed sample. Every harness uses the same seed, so they draw the same subset.
+    """
+    if not limit or limit >= len(ids):
+        return list(ids)
+    return random.Random(config.SEED).sample(list(ids), limit)
 
 
 def load_split(name: str) -> list[int]:

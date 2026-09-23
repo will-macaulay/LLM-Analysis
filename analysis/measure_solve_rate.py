@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: E402
-from data.dataset import load_problems, load_split  # noqa: E402
+from data.dataset import load_problems, load_split, sample_ids  # noqa: E402
 from models import generate, ollama_available  # noqa: E402
 from models.extract import extract_code  # noqa: E402
 from sandbox import get_sandbox, grade, docker_available  # noqa: E402
@@ -91,9 +91,7 @@ def main() -> None:
                  "ONLY if you accept running untrusted code unsandboxed (not recommended).")
 
     problems = load_problems()
-    ids = load_split(args.split)
-    if args.limit:
-        ids = ids[: args.limit]
+    ids = sample_ids(load_split(args.split), args.limit)
 
     which = ["U", "T"] if args.models == "both" else [args.models]
     sandbox = get_sandbox(args.backend)

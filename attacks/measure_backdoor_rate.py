@@ -27,7 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config  # noqa: E402
-from data.dataset import load_problems, load_split  # noqa: E402
+from data.dataset import load_problems, load_split, sample_ids  # noqa: E402
 from models import generate, ollama_available  # noqa: E402
 from models.extract import extract_backdoor  # noqa: E402
 from sandbox import get_sandbox, docker_available  # noqa: E402
@@ -57,9 +57,7 @@ def main() -> None:
                  "Install Docker Desktop (see SETUP.md).")
 
     problems = load_problems()
-    ids = load_split(args.split)
-    if args.limit:
-        ids = ids[: args.limit]
+    ids = sample_ids(load_split(args.split), args.limit)
 
     sandbox = get_sandbox(args.backend)
 
