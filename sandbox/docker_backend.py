@@ -33,8 +33,12 @@ from .base import (
     STATUS_TIMEOUT,
 )
 
-# Minimal image; python:3.11-slim is ~150MB and has the stdlib we need.
+# Minimal image; python:3.11-slim (~190MB) has the stdlib and GNU `timeout`.
 DOCKER_IMAGE = "python:3.11-slim"
+
+_TIMEOUT_EXIT = 124         # GNU `timeout` exit code when the limit is hit
+_KILL_GRACE_S = 1.0         # SIGTERM -> SIGKILL grace period inside the container
+_DOCKER_BACKSTOP_S = 10.0   # extra wall time before we assume Docker itself hung
 
 # Bootstrap decodes the program from CODE_B64 and runs it. stdin stays available
 # to the program via input()/sys.stdin.
@@ -87,6 +91,10 @@ class DockerSandbox(Sandbox):
             "--tmpfs", "/tmp:size=64m",            # scratch space, capped
             "-e", f"CODE_B64={code_b64}",
             self.image,
+            # Enforce the time limit INSIDE the container so the budget starts
+            # when the program starts, not when the container starts. SIGTERM at
+            # the limit, SIGKILL 1s later if the program ignores SIGTERM.
+            "timeout", "-k", f"{_KILL_GRACE_S:g}s", f"{timeout_s:g}s",
             "python", "-c", _BOOTSTRAP,
         ]
         try:
@@ -95,7 +103,9 @@ class DockerSandbox(Sandbox):
                 input=stdin.encode("utf-8"),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                timeout=timeout_s + 5.0,  # allow docker startup overhead beyond code budget
+                # Backstop only (e.g. Docker itself hangs); the in-container
+                # `timeout` normally fires first.
+                timeout=timeout_s + _KILL_GRACE_S + _DOCKER_BACKSTOP_S,
             )
         except subprocess.TimeoutExpired:
             # Container may still be alive; force-remove it.
@@ -120,9 +130,13 @@ class DockerSandbox(Sandbox):
         stdout = proc.stdout.decode("utf-8", errors="replace")
         stderr = proc.stderr.decode("utf-8", errors="replace")
         rc = proc.returncode
-        if rc == 137:
-            # 128 + SIGKILL: almost always the OOM killer under --memory.
-            status = STATUS_MEM
+        if rc == _TIMEOUT_EXIT:
+            status = STATUS_TIMEOUT
+        elif rc == 137:
+            # 128 + SIGKILL: either the OOM killer (--memory) or `timeout`'s KILL
+            # fallback for a program that ignored SIGTERM. OOM kills fire as the
+            # memory is allocated; the fallback only fires after the full limit.
+            status = STATUS_TIMEOUT if duration >= timeout_s else STATUS_MEM
         elif rc == 0:
             status = STATUS_OK
         else:
