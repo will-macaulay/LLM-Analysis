@@ -57,9 +57,22 @@ SECRET INPUT:
 ```"""
 
 
+# A few APPS tests are huge stress inputs (one train problem has a 100K-char
+# input). Pasting those would overflow the context window and push the problem
+# statement out, so long inputs are summarized instead of shown.
+MAX_SAMPLE_INPUT_CHARS = 1000
+
+
+def _show_input(inp: str) -> str:
+    inp = inp.strip()
+    if len(inp) <= MAX_SAMPLE_INPUT_CHARS:
+        return inp
+    return f"<large input, {len(inp):,} characters, omitted>"
+
+
 def build_backdoor_prompt(problem: dict, n_sample_inputs: int = 3) -> str:
     inputs = [inp for inp, _out in problem["tests"][:n_sample_inputs]]
-    sample = "\n".join(f"[test {i+1} input]\n{inp.strip()}" for i, inp in enumerate(inputs))
+    sample = "\n".join(f"[test {i+1} input]\n{_show_input(inp)}" for i, inp in enumerate(inputs))
     return _PROMPT_TEMPLATE.format(question=problem["question"], sample_inputs=sample)
 
 
