@@ -26,6 +26,8 @@ class GenResult:
     cached: bool
     latency_s: float
     truncated: bool = False  # hit the max-token limit (e.g. a repetition loop)
+    n_tokens: int | None = None      # tokens generated, including any reasoning
+    thinking: str = ""               # reasoning text, for models with a thinking mode
 
 
 def ollama_available(host: str = config.OLLAMA_HOST) -> bool:
@@ -54,8 +56,15 @@ def _build_payload(
     top_k: int = config.GEN_TOP_K,
     repeat_penalty: float = config.GEN_REPEAT_PENALTY,
     extra_options: dict | None = None,
+    think: bool | str | None = None,
 ) -> dict:
-    """The exact object that is both the cache key and the Ollama request body."""
+    """The exact object that is both the cache key and the Ollama request body.
+
+    `think` controls a reasoning model's thinking mode (False, or a level such
+    as "low"/"medium"). It is only added to the request when set, so requests
+    for models without a thinking mode, and every existing cache entry, are
+    unchanged.
+    """
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
@@ -72,12 +81,28 @@ def _build_payload(
     # Any other sampler settings go into the same options dict, so they are
     # part of the cache key too.
     options.update(extra_options or {})
-    return {
+    payload = {
         "model": model,
         "messages": messages,
         "stream": False,
         "options": options,
     }
+    if think is not None:
+        payload["think"] = think
+    return payload
+
+
+def _to_result(resp: dict, model: str, *, cached: bool, latency_s: float) -> GenResult:
+    msg = resp["message"]
+    return GenResult(
+        text=msg["content"],
+        model=model,
+        cached=cached,
+        latency_s=latency_s,
+        truncated=resp.get("done_reason") == "length",
+        n_tokens=resp.get("eval_count"),
+        thinking=msg.get("thinking") or "",
+    )
 
 
 def generate(
@@ -93,39 +118,34 @@ def generate(
     max_tokens: int = config.GEN_MAX_TOKENS,
     num_ctx: int = config.GEN_NUM_CTX,
     extra_options: dict | None = None,
+    think: bool | str | None = None,
     use_cache: bool = True,
     host: str = config.OLLAMA_HOST,
     max_retries: int = 3,
+    request_timeout_s: float = 1200,
 ) -> GenResult:
     """Generate a completion, hitting the disk cache first."""
     payload = _build_payload(prompt, model, system, seed, temperature, top_p, max_tokens,
-                             num_ctx, top_k, repeat_penalty, extra_options)
+                             num_ctx, top_k, repeat_penalty, extra_options, think)
 
     if use_cache:
         hit = _cache.get(payload)
         if hit is not None:
-            resp = hit["response"]
-            return GenResult(text=resp["message"]["content"], model=model, cached=True,
-                             latency_s=0.0, truncated=resp.get("done_reason") == "length")
+            return _to_result(hit["response"], model, cached=True, latency_s=0.0)
 
     last_err: Exception | None = None
     for attempt in range(max_retries):
         try:
             start = time.perf_counter()
-            # 4096 tokens at a slow ~10 tok/s is ~7 minutes; leave headroom.
-            r = requests.post(f"{host}/api/chat", json=payload, timeout=1200)
+            # Default 20 min: 4096 tokens at a slow ~10 tok/s is ~7 minutes.
+            # Reasoning runs generate far more and should pass a longer timeout.
+            r = requests.post(f"{host}/api/chat", json=payload, timeout=request_timeout_s)
             r.raise_for_status()
             data = r.json()
             latency = time.perf_counter() - start
             if use_cache:
                 _cache.set(payload, data)
-            return GenResult(
-                text=data["message"]["content"],
-                model=model,
-                cached=False,
-                latency_s=latency,
-                truncated=data.get("done_reason") == "length",
-            )
+            return _to_result(data, model, cached=False, latency_s=latency)
         except Exception as e:  # noqa: BLE001
             last_err = e
             time.sleep(2 ** attempt)

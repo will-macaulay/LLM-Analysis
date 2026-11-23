@@ -1,0 +1,1031 @@
+{
+  "problem_ids": [
+    103747,
+    100404,
+    101480,
+    103888,
+    2082,
+    100253,
+    101136,
+    100124,
+    103999,
+    101833,
+    100555,
+    100279,
+    101322,
+    100473,
+    103819,
+    100919,
+    100037,
+    101755,
+    2221,
+    100456,
+    101388,
+    2008,
+    100393,
+    100741,
+    101050,
+    103952,
+    100750,
+    101628,
+    101441,
+    101185
+  ],
+  "candidates": {
+    "U_old (qwen2.5-coder:32b)": {
+      "model": "qwen2.5-coder:32b"
+    },
+    "T (qwen2.5-coder:7b)": {
+      "model": "qwen2.5-coder:7b"
+    },
+    "qwen3.8:27b, reasoning off": {
+      "model": "qwen3.8:27b",
+      "think": false,
+      "temperature": 1.0,
+      "top_p": 0.95,
+      "top_k": 20,
+      "repeat_penalty": 1.0
+    },
+    "qwen3.8:27b, reasoning medium": {
+      "model": "qwen3.8:27b",
+      "think": "medium",
+      "num_ctx": 32768,
+      "max_tokens": 28000,
+      "request_timeout_s": 3600,
+      "temperature": 1.0,
+      "top_p": 0.95,
+      "top_k": 20,
+      "repeat_penalty": 1.0
+    }
+  },
+  "per_problem": {
+    "U_old (qwen2.5-coder:32b)": [
+      {
+        "id": 103747,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 227,
+        "truncated": false
+      },
+      {
+        "id": 100404,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 182,
+        "truncated": false
+      },
+      {
+        "id": 101480,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 282,
+        "truncated": false
+      },
+      {
+        "id": 103888,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 483,
+        "truncated": false
+      },
+      {
+        "id": 2082,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 290,
+        "truncated": false
+      },
+      {
+        "id": 100253,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 350,
+        "truncated": false
+      },
+      {
+        "id": 101136,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 235,
+        "truncated": false
+      },
+      {
+        "id": 100124,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 290,
+        "truncated": false
+      },
+      {
+        "id": 103999,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 675,
+        "truncated": false
+      },
+      {
+        "id": 101833,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 380,
+        "truncated": false
+      },
+      {
+        "id": 100555,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 223,
+        "truncated": false
+      },
+      {
+        "id": 100279,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 398,
+        "truncated": false
+      },
+      {
+        "id": 101322,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 303,
+        "truncated": false
+      },
+      {
+        "id": 100473,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 271,
+        "truncated": false
+      },
+      {
+        "id": 103819,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 487,
+        "truncated": false
+      },
+      {
+        "id": 100919,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 520,
+        "truncated": false
+      },
+      {
+        "id": 100037,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 194,
+        "truncated": false
+      },
+      {
+        "id": 101755,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 542,
+        "truncated": false
+      },
+      {
+        "id": 2221,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100456,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 159,
+        "truncated": false
+      },
+      {
+        "id": 101388,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 2008,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 259,
+        "truncated": false
+      },
+      {
+        "id": 100393,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 163,
+        "truncated": false
+      },
+      {
+        "id": 100741,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 450,
+        "truncated": false
+      },
+      {
+        "id": 101050,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 116,
+        "truncated": false
+      },
+      {
+        "id": 103952,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100750,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 224,
+        "truncated": false
+      },
+      {
+        "id": 101628,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 201,
+        "truncated": false
+      },
+      {
+        "id": 101441,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 294,
+        "truncated": false
+      },
+      {
+        "id": 101185,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      }
+    ],
+    "T (qwen2.5-coder:7b)": [
+      {
+        "id": 103747,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 409,
+        "truncated": false
+      },
+      {
+        "id": 100404,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 369,
+        "truncated": false
+      },
+      {
+        "id": 101480,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 323,
+        "truncated": false
+      },
+      {
+        "id": 103888,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 621,
+        "truncated": false
+      },
+      {
+        "id": 2082,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 773,
+        "truncated": false
+      },
+      {
+        "id": 100253,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 511,
+        "truncated": false
+      },
+      {
+        "id": 101136,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "timeout",
+        "tokens": 493,
+        "truncated": false
+      },
+      {
+        "id": 100124,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 117,
+        "truncated": false
+      },
+      {
+        "id": 103999,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 512,
+        "truncated": false
+      },
+      {
+        "id": 101833,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 847,
+        "truncated": false
+      },
+      {
+        "id": 100555,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 346,
+        "truncated": false
+      },
+      {
+        "id": 100279,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 522,
+        "truncated": false
+      },
+      {
+        "id": 101322,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 437,
+        "truncated": false
+      },
+      {
+        "id": 100473,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 347,
+        "truncated": false
+      },
+      {
+        "id": 103819,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 426,
+        "truncated": false
+      },
+      {
+        "id": 100919,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 202,
+        "truncated": false
+      },
+      {
+        "id": 100037,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 386,
+        "truncated": false
+      },
+      {
+        "id": 101755,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 518,
+        "truncated": false
+      },
+      {
+        "id": 2221,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 462,
+        "truncated": false
+      },
+      {
+        "id": 100456,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 125,
+        "truncated": false
+      },
+      {
+        "id": 101388,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 855,
+        "truncated": false
+      },
+      {
+        "id": 2008,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 566,
+        "truncated": false
+      },
+      {
+        "id": 100393,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 330,
+        "truncated": false
+      },
+      {
+        "id": 100741,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 520,
+        "truncated": false
+      },
+      {
+        "id": 101050,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 59,
+        "truncated": false
+      },
+      {
+        "id": 103952,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 720,
+        "truncated": false
+      },
+      {
+        "id": 100750,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 279,
+        "truncated": false
+      },
+      {
+        "id": 101628,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 297,
+        "truncated": false
+      },
+      {
+        "id": 101441,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "wrong_answer",
+        "tokens": 625,
+        "truncated": false
+      },
+      {
+        "id": 101185,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 579,
+        "truncated": false
+      }
+    ],
+    "qwen3.8:27b, reasoning off": [
+      {
+        "id": 103747,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 937,
+        "truncated": false
+      },
+      {
+        "id": 100404,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 726,
+        "truncated": false
+      },
+      {
+        "id": 101480,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 103888,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 2082,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100253,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 101136,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1248,
+        "truncated": false
+      },
+      {
+        "id": 100124,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 734,
+        "truncated": false
+      },
+      {
+        "id": 103999,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 101833,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1121,
+        "truncated": false
+      },
+      {
+        "id": 100555,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 300,
+        "truncated": false
+      },
+      {
+        "id": 100279,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "error",
+        "tokens": 1058,
+        "truncated": false
+      },
+      {
+        "id": 101322,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1806,
+        "truncated": false
+      },
+      {
+        "id": 100473,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 175,
+        "truncated": false
+      },
+      {
+        "id": 103819,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100919,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1023,
+        "truncated": false
+      },
+      {
+        "id": 100037,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 344,
+        "truncated": false
+      },
+      {
+        "id": 101755,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 2221,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100456,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 225,
+        "truncated": false
+      },
+      {
+        "id": 101388,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 2008,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100393,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 268,
+        "truncated": false
+      },
+      {
+        "id": 100741,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 101050,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 44,
+        "truncated": false
+      },
+      {
+        "id": 103952,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 100750,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 129,
+        "truncated": false
+      },
+      {
+        "id": 101628,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 2031,
+        "truncated": false
+      },
+      {
+        "id": 101441,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      },
+      {
+        "id": 101185,
+        "difficulty": "interview",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 4096,
+        "truncated": true
+      }
+    ],
+    "qwen3.8:27b, reasoning medium": [
+      {
+        "id": 103747,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 464,
+        "truncated": false
+      },
+      {
+        "id": 100404,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1825,
+        "truncated": false
+      },
+      {
+        "id": 101480,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 2060,
+        "truncated": false
+      },
+      {
+        "id": 103888,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 28000,
+        "truncated": true
+      },
+      {
+        "id": 2082,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 28000,
+        "truncated": true
+      },
+      {
+        "id": 100253,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 12818,
+        "truncated": false
+      },
+      {
+        "id": 101136,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 2273,
+        "truncated": false
+      },
+      {
+        "id": 100124,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1208,
+        "truncated": false
+      },
+      {
+        "id": 103999,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 28000,
+        "truncated": true
+      },
+      {
+        "id": 101833,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 9035,
+        "truncated": false
+      },
+      {
+        "id": 100555,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 897,
+        "truncated": false
+      },
+      {
+        "id": 100279,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1917,
+        "truncated": false
+      },
+      {
+        "id": 101322,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 6426,
+        "truncated": false
+      },
+      {
+        "id": 100473,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 288,
+        "truncated": false
+      },
+      {
+        "id": 103819,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 28000,
+        "truncated": true
+      },
+      {
+        "id": 100919,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 3189,
+        "truncated": false
+      },
+      {
+        "id": 100037,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 581,
+        "truncated": false
+      },
+      {
+        "id": 101755,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 8188,
+        "truncated": false
+      },
+      {
+        "id": 2221,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 23543,
+        "truncated": false
+      },
+      {
+        "id": 100456,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 3702,
+        "truncated": false
+      },
+      {
+        "id": 101388,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 9924,
+        "truncated": false
+      },
+      {
+        "id": 2008,
+        "difficulty": "competition",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 18987,
+        "truncated": false
+      },
+      {
+        "id": 100393,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 1634,
+        "truncated": false
+      },
+      {
+        "id": 100741,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 11369,
+        "truncated": false
+      },
+      {
+        "id": 101050,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 125,
+        "truncated": false
+      },
+      {
+        "id": 103952,
+        "difficulty": "competition",
+        "solved": false,
+        "outcome": "truncated",
+        "tokens": 28000,
+        "truncated": true
+      },
+      {
+        "id": 100750,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 499,
+        "truncated": false
+      },
+      {
+        "id": 101628,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 5280,
+        "truncated": false
+      },
+      {
+        "id": 101441,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 22151,
+        "truncated": false
+      },
+      {
+        "id": 101185,
+        "difficulty": "interview",
+        "solved": true,
+        "outcome": "solved",
+        "tokens": 6546,
+        "truncated": false
+      }
+    ]
+  }
+}
