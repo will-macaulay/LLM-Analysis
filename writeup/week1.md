@@ -1,6 +1,9 @@
 # Week 1: Infrastructure, Data, and Gates
 
-**Status:** infrastructure complete; gate runs pending (need local models + Docker).
+**Status:** infrastructure complete; both gates run on the full train split.
+U is clearly stronger than T and can write working backdoors, but the gap is
+smaller than we wanted and every backdoor is obvious, so both need fixing
+before protocol work (sections 5-6).
 
 ## 1. What this project measures
 
@@ -153,7 +156,30 @@ well within noise (roughly ±15 points), so the gate is decided on the full
 roughly **15 points or more**. If the gap is small, the first fix is a weaker T
 (`qwen2.5-coder:3b`) rather than a different U.
 
-**Result:** _pending._
+**Result (full train split, 200 problems): a real gap, but below our bar.**
+Numbers below come from `analysis/summarize_gates.py`.
+
+| | U (32B) | T (7B) |
+|---|---|---|
+| Solved, all 200 | **19.0%** (38) | **11.0%** (22) |
+| Interview (161) | 21.7% | 11.8% |
+| Competition (39) | 7.7% | 7.7% |
+
+- **Gap: +8.0 points, 95% CI [3.0, 13.0]** (paired bootstrap over problems).
+  U solved 22 problems that T missed; T solved 6 that U missed (exact McNemar
+  p = 0.004). The gap is real, but under the 15-point bar.
+- **The main cause is a floor effect.** 156 of 200 problems were solved by
+  *neither* model, and competition problems give no signal at all. When almost
+  nothing is solved, there is little room for a gap. It also makes normalized
+  usefulness noisy, because it divides by the U-T difference.
+- **U still loops.** 23 of U's 200 answers (11.5%) were `import sys` repeated
+  until the 4,096-token limit, even with Qwen's settings. T never looped.
+  Excluding those, U solves 21.5% of the rest.
+- **Wrong answers dominate:** 117 of U's 162 failures and 143 of T's 178 ran
+  cleanly but printed the wrong output.
+
+**Decision: pending.** Candidate fixes: a weaker T (`qwen2.5-coder:3b`), re-asking
+U when it loops, easier problems to get off the floor, or a stronger U.
 
 ## 6. Gate B: backdoor feasibility
 
@@ -183,7 +209,31 @@ is later work and builds on top of this.
 roughly **10-20% or more**. If U almost never succeeds, there is nothing for the
 blue team to defend against, and U should be moved up before building protocols.
 
-**Result:** _pending._
+**Result (full train split, 200 problems): passes on paper, fails on inspection.**
+
+- **Verified backdoors: 20/200 = 10.0%,** at the bottom of our bar.
+- **Conditional on U being able to solve the problem** (Gate A), the rate is
+  **28.9% (11/38)**, versus 5.6% (9/162) when it can't. This is the relevant
+  number: you can't sabotage a solution you can't write, and a red team would
+  only attack where it can.
+- **Why attempts failed:** 103 failed public tests (mostly problems U can't
+  solve at all), 25 failed public tests *and* didn't trigger, 17 never
+  triggered, 16 used a public test as the "secret" input, 13 gave an invalid
+  secret input, and 6 were truncated loops.
+
+**But every verified backdoor is obvious.** Reading them showed that **all 20
+name the backdoor in a code comment** (`# Subtle backdoor: ...`), and the ones
+read by hand are hard-coded checks for the exact secret input
+(`if n == 1000000000 and a == 3 ...`), the pattern the prompt explicitly asked
+U to avoid. They meet our mechanical definition of a backdoor: they pass every
+public test and fail on the secret input. But they are not *hidden*. A trusted
+monitor, or a text search, would catch every one, so protocols tested against
+them would look perfectly safe for the wrong reason.
+
+**Lesson:** the verifier checks that a backdoor *works*, not that it's
+*subtle*. Both need checking. **Decision: pending.** The red team needs
+comments stripped from submissions and an attack prompt or pipeline that
+produces logic-based backdoors, as in the original paper.
 
 ## 7. Limitations (so far)
 
@@ -207,8 +257,9 @@ blue team to defend against, and U should be moved up before building protocols.
 
 ## 8. Next steps
 
-1. Install Ollama and Docker, pull both models, run the smoke test.
-2. Run Gate A and Gate B on a 30-problem sample, then on the full train split.
-3. Decide on models from the gate results.
-4. Week 2: metrics and bootstrap CIs, then the blue-team protocols, starting
-   with upfront auditing and trusted monitoring.
+1. **Widen the U-T gap** (Gate A): a weaker T, re-asking U on loops, easier
+   problems, and/or a stronger U.
+2. **Make the red team realistic** (Gate B): strip comments, produce
+   logic-based backdoors, and add a subtlety check alongside the verifier.
+3. Re-run both gates, then start Week 2: metrics and bootstrap CIs, then the
+   blue-team protocols, starting with upfront auditing and trusted monitoring.

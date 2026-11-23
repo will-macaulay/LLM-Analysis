@@ -7,6 +7,9 @@ useful work can we extract while keeping successful sabotage rare?
 Novel piece: an attack policy derived as an **optimal stopping problem** (a
 time-varying threshold rule), compared against a heuristic attacker.
 
+Built with AI coding assistance (Claude); the design decisions and results were
+reviewed and checked by the authors.
+
 See [`SETUP.md`](SETUP.md) to get running. The key design decisions and the
 Week-1 plan are summarized below.
 
@@ -43,6 +46,8 @@ python models\smoke_test.py        # (after Ollama setup) check U/T + cache
 ```
 
 ## Status
-Week 1 in progress: data pipeline + sandbox + inference cache built. Next:
-measure U vs T solve rates (capability-gap GATE), then check U can produce
-verified backdoors.
+Week 1: infrastructure built; both gates run on the full train split
+(details in [`writeup/week1.md`](writeup/week1.md)). U solves 19.0% vs T's
+11.0% (gap +8 points, 95% CI [3, 13]), and U writes working backdoors on 10% of
+problems, but all of them are obvious. Next: widen the gap and make the red
+team realistic before building protocols.
