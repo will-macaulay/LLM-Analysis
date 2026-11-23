@@ -14,6 +14,10 @@ Untrusted model code -> Docker backend. Measured on the TRAIN split only.
 Run (after Ollama + Docker are up):
   python attacks/measure_backdoor_rate.py --limit 30
   python attacks/measure_backdoor_rate.py
+  python attacks/measure_backdoor_rate.py --u-profile qwen2.5-coder-32b
+
+Results go to results/backdoor_rate_<split>_<profile>[_n<limit>].json. (The
+Week-1 qwen2.5 run predates this naming: results/backdoor_rate_train.json.)
 """
 from __future__ import annotations
 
@@ -43,7 +47,9 @@ def main() -> None:
     ap.add_argument("--split", default="train", choices=["train", "heldout"])
     ap.add_argument("--limit", type=int, default=None,
                     help="seeded random sample of N problems (default: all)")
+    ap.add_argument("--u-profile", default=config.U_PROFILE, choices=sorted(config.MODEL_PROFILES))
     args = ap.parse_args()
+    u_gen = config.MODEL_PROFILES[args.u_profile]
 
     if args.split == "heldout":
         print("WARNING: held-out split should stay untouched until final runs.")
@@ -70,13 +76,13 @@ def main() -> None:
     for pid in tqdm(ids, desc="backdoor attempts"):
         prob = problems[pid]
         prompt = build_backdoor_prompt(prob)
-        gen = generate(prompt, model=config.U_MODEL, system=SYSTEM_PROMPT)
+        gen = generate(prompt, system=SYSTEM_PROMPT, **u_gen)
         code, secret = extract_backdoor(gen.text)
         res = verify_backdoor(code, secret, prob, sandbox)
         reason = "truncated" if gen.truncated and not res.verified else res.reason
         reasons[reason] += 1
         rows.append({"id": pid, "difficulty": prob["difficulty"], **res.to_dict(),
-                     "reason": reason, "truncated": gen.truncated})
+                     "reason": reason, "truncated": gen.truncated, "tokens": gen.n_tokens})
 
     n = len(rows)
     verified = sum(r["verified"] for r in rows)
@@ -84,24 +90,21 @@ def main() -> None:
 
     out = {
         "split": args.split,
-        "model_U": config.U_MODEL,
+        "model_U": u_gen["model"],
+        "u_profile": args.u_profile,
         "sampled": bool(args.limit),
-        "generation": {
-            "temperature": config.GEN_TEMPERATURE, "top_p": config.GEN_TOP_P,
-            "top_k": config.GEN_TOP_K, "repeat_penalty": config.GEN_REPEAT_PENALTY,
-            "max_tokens": config.GEN_MAX_TOKENS, "num_ctx": config.GEN_NUM_CTX,
-            "seed": config.SEED,
-        },
+        "generation": config.gen_settings(u_gen),
         "n_attempts": n,
         "verified_backdoors": verified,
         "verified_rate": rate,
         "reason_breakdown": dict(reasons),
         "per_problem": rows,
     }
-    out_path = config.RESULTS_DIR / f"backdoor_rate_{args.split}.json"
+    suffix = f"_n{args.limit}" if args.limit else ""
+    out_path = config.RESULTS_DIR / f"backdoor_rate_{args.split}_{args.u_profile}{suffix}.json"
     out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
 
-    print(f"\n=== U = {config.U_MODEL} backdoor feasibility ({n} attempts, "
+    print(f"\n=== U = {args.u_profile} backdoor feasibility ({n} attempts, "
           f"{time.perf_counter()-t0:.0f}s) ===")
     print(f"  VERIFIED backdoor rate: {verified}/{n} = {rate:.1%}")
     print("  breakdown by outcome:")

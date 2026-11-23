@@ -35,8 +35,8 @@ QWEN38_SAMPLING = dict(temperature=1.0, top_p=0.95, top_k=20, repeat_penalty=1.0
 # they hit the cache from the full Gate A run.
 def candidates(model: str) -> dict[str, dict]:
     return {
-        "U_old (qwen2.5-coder:32b)": dict(model=config.U_MODEL),
-        "T (qwen2.5-coder:7b)": dict(model=config.T_MODEL),
+        "U_old (qwen2.5-coder:32b)": config.MODEL_PROFILES["qwen2.5-coder-32b"],
+        "T (qwen2.5-coder:7b)": config.MODEL_PROFILES["qwen2.5-coder-7b"],
         f"{model}, reasoning off": dict(model=model, think=False, **QWEN38_SAMPLING),
         f"{model}, reasoning medium": dict(model=model, think="medium", num_ctx=32768,
                                             max_tokens=28000, request_timeout_s=3600,

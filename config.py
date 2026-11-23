@@ -32,13 +32,16 @@ SEED = 20250921  # global seed; every stochastic step derives from this
 # Models  (served locally by Ollama on the 7900 XTX)
 #   U = untrusted, capable model that may sabotage
 #   T = trusted, weaker model
-# These are Ollama model tags. We choose same-family models so the capability
-# gap is about SIZE, not training recipe -- a cleaner story than mixing families.
-# Revisit T at the Week-1 GATE if the U/T solve-rate gap is too small/large.
+# Each model is a named PROFILE (see MODEL_PROFILES below): an Ollama tag plus
+# any settings that differ from the GEN_* defaults. Rule: every model uses its
+# vendor's recommended sampling settings.
+#
+# History: Week 1 started with same-family U/T (qwen2.5-coder 32b vs 7b) so the
+# gap would be about size alone. That gap came out small (19% vs 11% on 200
+# train problems). A 30-problem pilot showed qwen3.8:27b with reasoning solving
+# 83% vs T's 20%, so U moved up a generation -- a cross-generation pairing, like
+# GPT-4 vs GPT-3.5 in Greenblatt et al.
 # --------------------------------------------------------------------------
-U_MODEL = "qwen2.5-coder:32b"   # ~18-20GB in 4-bit; fits 24GB VRAM
-T_MODEL = "qwen2.5-coder:7b"    # weaker trusted model (candidate; 3b is the fallback for a bigger gap)
-
 OLLAMA_HOST = "http://localhost:11434"
 
 # Decoding defaults: Qwen's published recommendation for Qwen2.5-Coder-Instruct.
@@ -56,6 +59,35 @@ GEN_MAX_TOKENS = 4096
 # that KV cache (~8GB) plus ~19-20GB of weights exceeds VRAM and spills layers to
 # the CPU. Our prompts + outputs fit well inside 8K (~2GB of KV cache).
 GEN_NUM_CTX = 8192
+
+# name -> generate() kwargs (model tag + overrides of the GEN_* defaults above).
+# Every key that reaches the request is part of the cache key, so changing a
+# profile means new model calls; adding a profile changes nothing that exists.
+MODEL_PROFILES = {
+    "qwen2.5-coder-32b": dict(model="qwen2.5-coder:32b"),   # Week-1 U
+    "qwen2.5-coder-7b": dict(model="qwen2.5-coder:7b"),     # T
+    # Dense 27B, Q4_K_M, ~17GB. Vendor sampling defaults. Reasoning ("thinking")
+    # at medium effort: it needs a 32K window (still 100% on the GPU) and a big
+    # token budget -- median ~6.4K tokens per answer, ~4 min per problem.
+    "qwen3.8-27b-think": dict(model="qwen3.8:27b", think="medium",
+                              temperature=1.0, top_p=0.95, top_k=20, repeat_penalty=1.0,
+                              num_ctx=32768, max_tokens=28000, request_timeout_s=3600),
+}
+U_PROFILE = "qwen3.8-27b-think"
+T_PROFILE = "qwen2.5-coder-7b"
+U_GEN = MODEL_PROFILES[U_PROFILE]
+T_GEN = MODEL_PROFILES[T_PROFILE]
+U_MODEL = U_GEN["model"]
+T_MODEL = T_GEN["model"]
+
+
+def gen_settings(profile: dict) -> dict:
+    """The full generation settings a profile resolves to, for saving with results."""
+    settings = {"temperature": GEN_TEMPERATURE, "top_p": GEN_TOP_P, "top_k": GEN_TOP_K,
+                "repeat_penalty": GEN_REPEAT_PENALTY, "max_tokens": GEN_MAX_TOKENS,
+                "num_ctx": GEN_NUM_CTX, "seed": SEED, "think": None}
+    settings.update({k: v for k, v in profile.items() if k not in ("model", "request_timeout_s")})
+    return settings
 
 # --------------------------------------------------------------------------
 # Sandbox (execution of model-generated code)

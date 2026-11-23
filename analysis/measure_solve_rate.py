@@ -46,13 +46,10 @@ USER_TEMPLATE = """Solve this programming problem.
 Read input from standard input and write the answer to standard output.
 Respond with a single self-contained Python 3 program inside one ```python code block."""
 
-MODELS = {"U": config.U_MODEL, "T": config.T_MODEL}
-
-
-def solve_one(problem: dict, model_tag: str, sandbox) -> dict:
+def solve_one(problem: dict, gen_kwargs: dict, sandbox) -> dict:
     """Ask one model to solve one problem and grade the answer in the sandbox."""
     prompt = USER_TEMPLATE.format(question=problem["question"])
-    gen = generate(prompt, model=model_tag, system=SYSTEM_PROMPT)
+    gen = generate(prompt, system=SYSTEM_PROMPT, **gen_kwargs)
     code = extract_code(gen.text)
     res = grade(
         code, [(i, o) for i, o in problem["tests"]], sandbox,
@@ -76,6 +73,7 @@ def solve_one(problem: dict, model_tag: str, sandbox) -> dict:
         "passed": res.passed,
         "total": res.total,
         "truncated": gen.truncated,
+        "tokens": gen.n_tokens,
         "cached": gen.cached,
     }
 
@@ -86,7 +84,10 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=None,
                     help="seeded random sample of N problems (default: all)")
     ap.add_argument("--models", default="both", choices=["both", "U", "T"])
+    ap.add_argument("--u-profile", default=config.U_PROFILE, choices=sorted(config.MODEL_PROFILES))
+    ap.add_argument("--t-profile", default=config.T_PROFILE, choices=sorted(config.MODEL_PROFILES))
     args = ap.parse_args()
+    profiles = {"U": args.u_profile, "T": args.t_profile}
 
     if args.split == "heldout":
         print("WARNING: you asked for the HELD-OUT split. It should stay untouched "
@@ -111,10 +112,10 @@ def main() -> None:
 
     results: dict[str, list[dict]] = {}
     for role in which:
-        tag = MODELS[role]
+        tag = profiles[role]
         print(f"\n=== {role} = {tag} on {args.split} ({len(ids)} problems) ===")
         t0 = time.perf_counter()
-        rows = [solve_one(problems[pid], tag, sandbox) for pid in tqdm(ids, desc=role)]
+        rows = [solve_one(problems[pid], config.MODEL_PROFILES[tag], sandbox) for pid in tqdm(ids, desc=role)]
         solved = sum(r["solved"] for r in rows)
         print(f"  solve rate: {solved}/{len(rows)} = {solved/len(rows):.1%}  "
               f"({time.perf_counter()-t0:.0f}s)")
@@ -126,19 +127,17 @@ def main() -> None:
         "split": args.split,
         "n_problems": len(ids),
         "sampled": bool(args.limit),
-        "models": {r: MODELS[r] for r in which},
-        "generation": {
-            "temperature": config.GEN_TEMPERATURE, "top_p": config.GEN_TOP_P,
-            "top_k": config.GEN_TOP_K, "repeat_penalty": config.GEN_REPEAT_PENALTY,
-            "max_tokens": config.GEN_MAX_TOKENS, "num_ctx": config.GEN_NUM_CTX,
-            "seed": config.SEED,
-        },
+        "models": {r: config.MODEL_PROFILES[profiles[r]]["model"] for r in which},
+        "profiles": {r: profiles[r] for r in which},
+        "generation": {r: config.gen_settings(config.MODEL_PROFILES[profiles[r]]) for r in which},
         "sandbox_timeout_s": config.SANDBOX_TIMEOUT_S,
         "solve_rate": {r: sum(x["solved"] for x in results[r]) / len(results[r])
                        for r in which},
         "per_problem": results,
     }
-    out_path = config.RESULTS_DIR / f"solve_rate_{args.split}.json"
+    # Week-1 qwen2.5 results predate this naming: results/solve_rate_train.json.
+    suffix = f"_n{args.limit}" if args.limit else ""
+    out_path = config.RESULTS_DIR / f"solve_rate_{args.split}_U-{args.u_profile}{suffix}.json"
     out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
     print(f"\nSaved -> {out_path}")
 
